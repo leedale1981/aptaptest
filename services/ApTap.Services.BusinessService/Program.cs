@@ -16,7 +16,6 @@ namespace ApTap.Services.BusinessService
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("https://localhost:6001");
                     webBuilder.UseStartup<Startup>();
                 });
     }

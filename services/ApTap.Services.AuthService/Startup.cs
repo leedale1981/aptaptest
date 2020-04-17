@@ -18,11 +18,26 @@ namespace ApTap.Services.AuthService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddIdentityServer(options => 
+            {
+                options.IssuerUri = "http://localhost:5000";
+            })
+            .AddDeveloperSigningCredential()
+            .AddInMemoryApiResources(Config.GetApiResources())
+            .AddInMemoryClients(Config.GetClients());
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowClientOrigin",
+                builder => 
+                {
+                    builder.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
             services.AddControllers();
-            services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,9 +48,10 @@ namespace ApTap.Services.AuthService
                 app.UseDeveloperExceptionPage();
             }
             
+            app.UseCors("AllowClientOrigin");
             app.UseIdentityServer();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
